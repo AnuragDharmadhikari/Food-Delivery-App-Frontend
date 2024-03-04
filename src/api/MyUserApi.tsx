@@ -19,7 +19,7 @@ export const useGetMyUser = () => {
     if (!response.ok) {
       throw new Error("Failed to fetch User");
     }
-    return await response.json();
+    return  response.json();
   };
   const {
     data: currentUser,
