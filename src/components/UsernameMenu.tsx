@@ -19,7 +19,7 @@ const UsernameMenu = () => {
         {user?.email}
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem>
+        <DropdownMenuItem className="flex justify-center items-center">
           <Link
             to={"/user-profile"}
             className=" font-bold hover:text-orange-500"
