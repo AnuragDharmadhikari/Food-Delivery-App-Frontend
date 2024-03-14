@@ -12,56 +12,62 @@ import { Button } from "@/components/ui/button";
 import { Restaurant } from "@/types";
 import { useEffect } from "react";
 
-const formSchema = z.object({
-  restaurantName: z
-    .string({
-      required_error: "resturant name is required",
-    })
-    .refine((value) => value.trim() !== "", {
-      message: "name cannot be empty or contain only spaces",
+const formSchema = z
+  .object({
+    restaurantName: z
+      .string({
+        required_error: "resturant name is required",
+      })
+      .refine((value) => value.trim() !== "", {
+        message: "name cannot be empty or contain only spaces",
+      }),
+    city: z
+      .string({
+        required_error: "city name is required",
+      })
+      .refine((value) => value.trim() !== "", {
+        message: "city cannot be empty or contain only spaces",
+      }),
+    country: z
+      .string({
+        required_error: "country name is required",
+      })
+      .refine((value) => value.trim() !== "", {
+        message: "country cannot be empty or contain only spaces",
+      }),
+    deliveryPrice: z.coerce
+      .number({
+        required_error: "delivery price is required",
+        invalid_type_error: "must be a valid number",
+      })
+      .min(1, "Delivery Price is required"),
+    estimatedDeliveryTime: z.coerce
+      .number({
+        required_error: "Estimated Delivery Time is required",
+        invalid_type_error: "must be a valid number",
+      })
+      .min(1, "Estimated Delivery Time is required"),
+    cuisines: z.array(z.string()).nonempty({
+      message: "Please select atleast one item",
     }),
-  city: z
-    .string({
-      required_error: "city name is required",
-    })
-    .refine((value) => value.trim() !== "", {
-      message: "city cannot be empty or contain only spaces",
-    }),
-  country: z
-    .string({
-      required_error: "country name is required",
-    })
-    .refine((value) => value.trim() !== "", {
-      message: "country cannot be empty or contain only spaces",
-    }),
-  deliveryPrice: z.coerce
-    .number({
-      required_error: "delivery price is required",
-      invalid_type_error: "must be a valid number",
-    })
-    .min(1, "Delivery Price is required"),
-  estimatedDeliveryTime: z.coerce
-    .number({
-      required_error: "Estimated Delivery Time is required",
-      invalid_type_error: "must be a valid number",
-    })
-    .min(1, "Estimated Delivery Time is required"),
-  cuisines: z.array(z.string()).nonempty({
-    message: "Please select atleast one item",
-  }),
-  menuItems: z.array(
-    z.object({
-      name: z
-        .string()
-        .min(1, "name is required")
-        .refine((value) => value.trim() !== "", {
-          message: "name cannot be empty or contain only spaces",
-        }),
-      price: z.coerce.number().min(1, "price is required"),
-    })
-  ),
-  imageFile: z.instanceof(File, { message: "Image is required" }),
-});
+    menuItems: z.array(
+      z.object({
+        name: z
+          .string()
+          .min(1, "name is required")
+          .refine((value) => value.trim() !== "", {
+            message: "name cannot be empty or contain only spaces",
+          }),
+        price: z.coerce.number().min(1, "price is required"),
+      })
+    ),
+    imageUrl: z.string().optional(),
+    imageFile: z.instanceof(File, { message: "Image is required" }).optional(), //we are doing this optional bescuse of updatefunctionality
+  })
+  .refine((data) => data.imageUrl || data.imageFile, {
+    message: "Either image URL or image file must be provided",
+    path: ["imageFile"],
+  });
 
 type ResturantFormdata = z.infer<typeof formSchema>;
 
@@ -115,7 +121,9 @@ const ManageResturantForm = ({ onSave, isLoading, restaurant }: Props) => {
       fromData.append(`menuItems[${index}][name]`, menuItem.name);
       fromData.append(`menuItems[${index}][price]`, menuItem.price.toString());
     });
-    fromData.append(`imageFile`, formDataJson.imageFile);
+    if (formDataJson.imageFile) {
+      fromData.append(`imageFile`, formDataJson.imageFile);
+    }
 
     onSave(fromData);
   };
