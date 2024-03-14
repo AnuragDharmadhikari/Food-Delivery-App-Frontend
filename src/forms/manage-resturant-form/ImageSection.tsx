@@ -40,7 +40,7 @@ const ImageSection = () => {
                 <Input
                   className=" bg-white  hover:cursor-pointer"
                   type="file"
-                  accept=".jpg, .jpeg, .png"
+                  accept=".jpg, .jpeg, .png, .avif"
                   onChange={(event) =>
                     field.onChange(
                       event.target.files ? event.target.files[0] : null
